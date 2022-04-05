@@ -32,7 +32,7 @@ export default class App extends React.Component {
       },
     });
 
-    // console.log(response.data.items);
+    // console.log(response);
     this.setState({
       videos: response.data.items,
       selectedVideo: response.data.items[0],
@@ -52,7 +52,10 @@ export default class App extends React.Component {
             <div className="eleven wide column">
               <VideoDetail video={this.state.selectedVideo} />
             </div>
-            <div className="five wide column">
+            <div
+              className="five wide column"
+              style={{ height: '50vh', overflowX: 'hidden' }}
+            >
               <VideoList
                 videos={this.state.videos}
                 onVideoSelect={this.onVideoSelect}
