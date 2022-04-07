@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from './SearchBar';
 import VideoList from './VideoList';
 import VideoDetail from './VideoDetail';
-import youtube from '../apis/youtube';
+import useVideos from '../hooks/useVideos';
 
-export default class App extends React.Component {
-  state = { videos: [], selectedVideo: null };
+const App = () => {
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  searchTerms = [
+  const searchTerms = [
     'kpop',
     'league of legends',
     'girls generation',
@@ -17,53 +17,32 @@ export default class App extends React.Component {
     'indie folk',
     'kindie',
   ];
+  const random = searchTerms[Math.floor(Math.random() * searchTerms.length)];
 
-  componentDidMount() {
-    const random =
-      this.searchTerms[Math.floor(Math.random() * this.searchTerms.length)];
+  const [videos, search] = useVideos(random);
 
-    this.onTermSearch(random);
-  }
+  useEffect(() => {
+    setSelectedVideo(videos[0]);
+  }, [videos]);
 
-  onTermSearch = async (term) => {
-    const response = await youtube.get(`/search`, {
-      params: {
-        q: term,
-      },
-    });
-
-    // console.log(response);
-    this.setState({
-      videos: response.data.items,
-      selectedVideo: response.data.items[0],
-    });
-  };
-
-  onVideoSelect = (video) => {
-    this.setState({ selectedVideo: video });
-  };
-
-  render() {
-    return (
-      <div className="ui container">
-        <SearchBar onTermSearch={this.onTermSearch} />
-        <div className="ui grid">
-          <div className="ui row">
-            <div className="eleven wide column">
-              <VideoDetail video={this.state.selectedVideo} />
-            </div>
-            <div
-              className="five wide column"
-              style={{ height: '50vh', overflowX: 'hidden' }}
-            >
-              <VideoList
-                videos={this.state.videos}
-                onVideoSelect={this.onVideoSelect}
-              />
-            </div>
+  return (
+    <div className="ui container">
+      <SearchBar onTermSearch={search} />
+      <div className="ui grid">
+        <div className="ui row">
+          <div className="eleven wide column">
+            <VideoDetail video={selectedVideo} />
+          </div>
+          <div
+            className="five wide column"
+            style={{ height: '50vh', overflowX: 'hidden' }}
+          >
+            <VideoList videos={videos} onVideoSelect={setSelectedVideo} />
           </div>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default App;
